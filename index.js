@@ -7,8 +7,11 @@ $.support.cors = true;
 $.ajaxSettings.xhr = function () {
     return new XMLHttpRequest;
 }
+// Global variables
 var productArrayLessThan = [];
+var previousProductArrayLessThan = [];
 
+// Function declaration
 function convertVietnamese(str) {
     str= str.toLowerCase();
     str= str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a");
@@ -49,12 +52,17 @@ function getProductsLessThreshold(priceThreshold, productName, offset) {
             if(productArray.length > 0) {
                 getProductsLessThreshold(priceThreshold, productName, offset + 20);
             } else {
-                console.log('data: ', productArrayLessThan.length);
-                if(productArrayLessThan.length > 0) {
+                //console.log('data: ', productArrayLessThan.length);
+                var productStrings = productArrayLessThan.map(function (item) { return JSON.stringify(item) })
+                var diff = $(productStrings).not(previousProductArrayLessThan).get();
+                previousProductArrayLessThan = productStrings;
+                console.log('diff: ', diff);
+                if(diff.length > 0) {
                     console.log('Have new product');
                     //console.log('data: ', productArrayLessThan)
                     var htmlContent = '';
-                    productArrayLessThan.map(function(item, index) {
+                    diff.map(function(item, index) {
+                        item = JSON.parse(item);
                         var subject = convertVietnamese(item.subject);
                         var area_name = convertVietnamese(item.area_name);
                         var list_id = item.list_id;
@@ -67,14 +75,14 @@ function getProductsLessThreshold(priceThreshold, productName, offset) {
                     var transporter = nodemailer.createTransport({
                         service: 'gmail',
                         auth: {
-                            user: 'email của người gửi, nhập vô nh',
-                            pass: 'p'
+                            user: '',
+                            pass: ''
                         }
                     });
 
                     var mailOptions = {
-                        from: 'email của người g',
-                        to: 'email của người nh',
+                        from: '',
+                        to: '',
                         subject: 'Have new products',
                         html: htmlContent
                     };
@@ -83,9 +91,12 @@ function getProductsLessThreshold(priceThreshold, productName, offset) {
                         if (error) {
                             console.log('error: ', error);
                         } else {
+                            productArrayLessThan = [];
                             console.log('Email sent: ' + info.response);
                         }
                     });
+                } else {
+                    console.log('No Changes');
                 }
             }
         },
@@ -94,7 +105,6 @@ function getProductsLessThreshold(priceThreshold, productName, offset) {
         }
     });
 }
-var englishString = convertVietnamese('Giường sắt 2 tầng hộp vuông. Sơn tĩnh điện. Bh 1N');
-getProductsLessThreshold(800000, 'giường tầng', 0);
-/*
-setInterval( getBedProductsHavePriceLessThan800 ,5000);*/
+
+// This program starts here
+setInterval( getProductsLessThreshold ,600000, 800000, 'giường tầng', 0);
