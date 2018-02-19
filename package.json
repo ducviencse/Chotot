@@ -1,0 +1,14 @@
+{
+  "name": "index.js",
+  "version": "1.0.0",
+  "main": "jquery-ajax-with-node.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "jquery": "^2.1.4",
+    "jsdom-no-contextify": "^3.1.0",
+    "nodemailer": "^4.4.2",
+    "xmlhttprequest": "^1.7.0"
+  }
+}
